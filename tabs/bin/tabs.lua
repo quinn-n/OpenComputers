@@ -1,4 +1,3 @@
-local computer = require("computer")
 local event = require("event")
 local gpu = require("component").gpu
 local math = require("math")
@@ -348,7 +347,6 @@ local function closeTabListener(_, tabId)
     return
   end
   log:printFormatted(logger.verbosity.debug, "Received close_tab event with tab %s", tab)
-  computer.beep()
   closeTab(tab)
 end
 
