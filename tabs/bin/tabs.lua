@@ -12,7 +12,7 @@ local logger = require("logger")
 
 -- There is no good way to get the screen's refresh rate
 -- so this is just a good enough guesstimate
-local SCREEN_REFRESH_RATE = 30
+local SCREEN_REFRESH_RATE = 60
 
 local TAB_HEIGHT = 3
 
