@@ -8,6 +8,8 @@ Tabs lets users manage multiple programs at the same time in different tabs.
 Note that it doesn't quite run multiple programs at the same time. It only
 runs the tab the user is currently in, due to limitations with OpenOS's gpus.
 
+![Tabs screenshot](images/tabs%20screenshot.png "Tabs running")
+
 # Libraries
 
 ## Graphics
