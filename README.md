@@ -56,6 +56,6 @@ Library that contains a lot of boiler plate behind logging.
   - `Log:flush()`  
     Flushes log file handler
 
-  - `Log:close()`
+  - `Log:close()`  
     Closes log file handler
 
