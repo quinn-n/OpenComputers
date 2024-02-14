@@ -8,7 +8,7 @@ local string = require("string")
 --- @field print fun(self: Log, level: verbosity, msg: string)
 --- @field writeFormatted fun(self: Log, level: verbosity, format: string, ...: any)
 --- @field printFormatted fun(self: Log, level: verbosity, format: string, ...: any)
---- @field printTable fun(self: Log, level: verbosity, t: table, _tabLevel?: number)
+--- @field printTable fun(self: Log, level: verbosity, t: table, recursive: boolean, _tabLevel?: number)
 --- @field flush fun(self: Log)
 --- @field close fun(self: Log)
 
@@ -50,7 +50,7 @@ function logger.new(file, verbosity)
     printFormatted=function (self, level, format, ...)
       self:writeFormatted(level, format .. "\n", ...)
     end,
-    printTable=function (self, level, t, _tabLevel)
+    printTable=function (self, level, t, recursive, _tabLevel)
       if _tabLevel == nil then
         _tabLevel = 0
       end
@@ -58,9 +58,9 @@ function logger.new(file, verbosity)
       self:writeFormatted(level, "%s{\n", tabString)
 
       for k, v in pairs(t) do
-        if type(v) == "table" then
+        if type(v) == "table" and recursive then
           self:writeFormatted(level, "%s%s = ", tabString .. "  ", k)
-          self:printTable(level, v, _tabLevel + 1)
+          self:printTable(level, v, recursive, _tabLevel + 1)
         else
           self:writeFormatted(level, "%s%s = %s,\n", tabString .. "  ", k, v)
         end
@@ -85,7 +85,6 @@ end
 --- @enum verbosity
 logger.verbosity = {
   disabled = -1,
-  none = 0,
   error = 1,
   warn = 2,
   info = 3,
