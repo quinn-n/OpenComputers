@@ -69,7 +69,7 @@ end
 --- @param yy number ymax
 --- @param color number
 function graphics.draw.rect(x, y, xx, yy, color)
-  --Default to current color if color is nil
+  -- Default to current color if color is nil
   if color == nil then
     color = gpu.getBackground()
   end
