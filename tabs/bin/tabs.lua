@@ -34,7 +34,13 @@ local SHELL = os.getenv("SHELL")
 -- However I'm not going to worry too much about it because the same kind of attack can be done with the $SHELL
 -- environment variable above which there's no way around.
 local logDir = os.getenv("HOME") .. "/.local/tabs/log/"
-os.execute("mkdir -p " .. logDir)
+if LOG_LVL ~= logger.verbosity.disabled then
+  -- This will print an error if the directory already exists
+  -- But there's no good way to check if a directory exists in Lua
+  -- And the error message is quickly erased when tabs starts
+  -- So whatever ¯\_(ツ)_/¯
+  os.execute("mkdir -p " .. logDir)
+end
 
 local log = logger.new(logDir .. "/tabs.log", LOG_LVL)
 
@@ -80,21 +86,36 @@ local function updateButtonWidths()
   end
 end
 
--- Redraw tab bar
+--- Redraw tab bar
 local function redrawTabs()
+  if currentTab.thread:status() ~= "suspended" then
+    log:print(
+      logger.verbosity.error,
+      "Current tab thread is not suspended when redrawing tabs."
+    )
+  end
+
   local cursorBlink = term.getCursorBlink()
   term.setCursorBlink(false)
 
   local oldBuffer = gpu.setActiveBuffer(0)
+
+  -- Set the screen to the full height so we can draw the labels on the buttons
+  term.window.height = screenHeight
+
   -- Clear the tab area
   local screenWidth, _ = gpu.getResolution()
-  gpu.fill(1, 1, screenWidth, TAB_HEIGHT, " ")
+  gpu.fill(1, screenHeight - TAB_HEIGHT + 1, screenWidth, TAB_HEIGHT, " ")
   -- Draw tab buttons
   for _, tab in pairs(tabs) do
     graphics.button.draw(tab.selectButton)
     graphics.button.draw(tab.closeButton)
   end
   graphics.button.draw(newTabButton)
+
+  -- Reset the screen height
+  term.window.height = screenHeight - TAB_HEIGHT
+
   gpu.setActiveBuffer(oldBuffer)
 
   term.setCursorBlink(cursorBlink)
@@ -104,7 +125,7 @@ end
 --- @param buffer number
 local function blitTabBuffer(buffer)
   local bufferWidth, bufferHeight = gpu.getBufferSize(buffer)
-  gpu.bitblt(0, 1, TAB_HEIGHT + 1, bufferWidth, bufferHeight, buffer)
+  gpu.bitblt(0, 1, 1, bufferWidth, bufferHeight, buffer)
 end
 
 local function switchTab(tab)
@@ -151,9 +172,10 @@ end
 local function newTab()
   log:print(logger.verbosity.info, "Creating new tab")
 
-  -- Coordinates for buttons are set by `updateButtonWidths`
-  local selectButton = graphics.button.new(SHELL, 1, 1, 1, TAB_HEIGHT, 0x878787, backgroundColor)
-  local closeButton = graphics.button.new("X", 1, 1, 1, TAB_HEIGHT, 0xff0000, 0xcc0000)
+  -- Button x values are set by `updateButtonWidths`
+  log:flush()
+  local selectButton = graphics.button.new(SHELL, 1, screenHeight - TAB_HEIGHT, 1, screenHeight, 0x878787, backgroundColor)
+  local closeButton = graphics.button.new("X", 1, screenHeight - TAB_HEIGHT, 1, screenHeight, 0xff0000, 0xcc0000)
 
   local tab = {
     buffer=gpu.allocateBuffer(screenWidth, screenHeight - TAB_HEIGHT),
@@ -163,7 +185,7 @@ local function newTab()
     cursorRow=nil,
     selectButton=selectButton,
     closeButton=closeButton,
-    thread=nil,
+    thread=nil
   }
 
   tabIdCounter = tabIdCounter + 1
@@ -191,9 +213,9 @@ term.window.height = screenHeight - TAB_HEIGHT
 newTabButton = graphics.button.new(
   "+",
   screenWidth - 4,
-  1,
+  screenHeight - TAB_HEIGHT,
   screenWidth,
-  3,
+  screenHeight,
   0xb4b4b4,
   0x787878
 )
