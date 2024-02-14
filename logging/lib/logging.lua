@@ -12,17 +12,17 @@ local string = require("string")
 --- @field flush fun(self: Log)
 --- @field close fun(self: Log)
 
-local logger = {}
+local logging = {}
 
 --- @param file file* | string file handle or path to write to
 --- @param verbosity? verbosity verbosity level. Defaults to math.huge
 --- @return Log
-function logger.new(file, verbosity)
+function logging.new(file, verbosity)
   if verbosity == nil then
     verbosity = math.huge
   end
 
-  if type(file) == "string" and verbosity ~= logger.verbosity.disabled then
+  if type(file) == "string" and verbosity ~= logging.verbosity.disabled then
     local errmsg
     file, errmsg = io.open(file, "w")
     if file == nil then
@@ -69,12 +69,12 @@ function logger.new(file, verbosity)
       self:writeFormatted(level, "%s},\n", tabString)
     end,
     flush=function (self)
-      if self.level ~= logger.verbosity.disabled then
+      if self.level ~= logging.verbosity.disabled then
         self.file:flush()
       end
     end,
     close=function (self)
-      if self.level ~= logger.verbosity.disabled then
+      if self.level ~= logging.verbosity.disabled then
         self.file:close()
       end
     end
@@ -83,7 +83,7 @@ function logger.new(file, verbosity)
 end
 
 --- @enum verbosity
-logger.verbosity = {
+logging.verbosity = {
   disabled = -1,
   error = 1,
   warn = 2,
@@ -91,4 +91,4 @@ logger.verbosity = {
   debug = 4
 }
 
-return logger
+return logging

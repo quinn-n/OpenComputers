@@ -8,7 +8,7 @@ local thread = require("thread")
 
 
 local graphics = require("graphics")
-local logger = require("logger")
+local logging = require("logging")
 
 -- There is no good way to get the screen's refresh rate
 -- so this is just a good enough guesstimate
@@ -16,7 +16,7 @@ local SCREEN_REFRESH_RATE = 60
 
 local TAB_HEIGHT = 3
 
-local LOG_LVL = logger.verbosity.disabled
+local LOG_LVL = logging.verbosity.disabled
 
 local tabIdCounter = 1
 local tabs = {}
@@ -34,7 +34,7 @@ local SHELL = os.getenv("SHELL")
 -- However I'm not going to worry too much about it because the same kind of attack can be done with the $SHELL
 -- environment variable above which there's no way around.
 local logDir = os.getenv("HOME") .. "/.local/tabs/log/"
-if LOG_LVL ~= logger.verbosity.disabled then
+if LOG_LVL ~= logging.verbosity.disabled then
   -- This will print an error if the directory already exists
   -- But there's no good way to check if a directory exists in Lua
   -- And the error message is quickly erased when tabs starts
@@ -42,7 +42,7 @@ if LOG_LVL ~= logger.verbosity.disabled then
   os.execute("mkdir -p " .. logDir)
 end
 
-local log = logger.new(logDir .. "/tabs.log", LOG_LVL)
+local log = logging.new(logDir .. "/tabs.log", LOG_LVL)
 
 graphics.startLog(logDir .. "/graphics.log", LOG_LVL)
 
@@ -73,7 +73,7 @@ end
 local function updateButtonWidths()
   local tabWidth = getTabWidth()
   log:printFormatted(
-    logger.verbosity.debug,
+    logging.verbosity.debug,
     "Got tabWidth: %i",
     tabWidth
   )
@@ -90,7 +90,7 @@ end
 local function redrawTabs()
   if currentTab.thread:status() ~= "suspended" then
     log:print(
-      logger.verbosity.error,
+      logging.verbosity.error,
       "Current tab thread is not suspended when redrawing tabs."
     )
   end
@@ -130,7 +130,7 @@ end
 
 local function switchTab(tab)
   log:printFormatted(
-    logger.verbosity.debug,
+    logging.verbosity.debug,
     "Switching to tab %s",
     tab
   )
@@ -157,7 +157,7 @@ local function switchTab(tab)
 
   if tab.cursorCol ~= nil then
     log:printFormatted(
-      logger.verbosity.info,
+      logging.verbosity.info,
       "Setting cursor to (%i, %i)",
       tab.cursorCol,
       tab.cursorRow
@@ -170,7 +170,7 @@ end
 
 --- @return Tab
 local function newTab()
-  log:print(logger.verbosity.info, "Creating new tab")
+  log:print(logging.verbosity.info, "Creating new tab")
 
   -- Button x values are set by `updateButtonWidths`
   log:flush()
@@ -233,39 +233,39 @@ local function quit()
   local closeResult = event.cancel(closeTabListenerId)
   if blitResult then
     log:printFormatted(
-      logger.verbosity.info,
+      logging.verbosity.info,
       "Cancelled blit timer %i",
       blitTimerId
     )
   else
     log:printFormatted(
-      logger.verbosity.error,
+      logging.verbosity.error,
       "Failed to cancel blit timer %i",
       blitTimerId
     )
   end
   if touchResult then
     log:printFormatted(
-      logger.verbosity.info,
+      logging.verbosity.info,
       "Cancelled touch listener %i",
       touchListenerId
     )
   else
     log:printFormatted(
-      logger.verbosity.error,
+      logging.verbosity.error,
       "Failed to cancel touch listener %i",
       touchListenerId
     )
   end
   if closeResult then
     log:printFormatted(
-      logger.verbosity.info,
+      logging.verbosity.info,
       "Cancelled close tab listener %i",
       closeTabListenerId
     )
   else
     log:printFormatted(
-      logger.verbosity.error,
+      logging.verbosity.error,
       "Failed to cancel close tab listener %i",
       closeTabListenerId
     )
@@ -287,7 +287,7 @@ end
 --- @param _quitting? boolean used by the quit function to avoid re-calling `quit()`
 function closeTab(tab, _quitting)
   log:printFormatted(
-    logger.verbosity.info,
+    logging.verbosity.info,
     "Closing tab %s",
     tab
   )
@@ -362,13 +362,13 @@ local function closeTabListener(_, tabId)
   local tab = getTabById(tabId)
   if tab == nil then
     log:printFormatted(
-      logger.verbosity.error,
+      logging.verbosity.error,
       "Received close_tab event for non-existent tab %i",
       tabId
     )
     return
   end
-  log:printFormatted(logger.verbosity.debug, "Received close_tab event with tab %s", tab)
+  log:printFormatted(logging.verbosity.debug, "Received close_tab event with tab %s", tab)
   closeTab(tab)
 end
 

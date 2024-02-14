@@ -6,7 +6,7 @@ local string = require("string")
 local table = require("table")
 local tty = require("tty")
 
-local logger = require("logger")
+local logging = require("logging")
 
 local graphics = {}
 graphics.draw = {}
@@ -44,7 +44,7 @@ local log = nil
 --- @param path string
 --- @param level verbosity
 function graphics.startLog(path, level)
-  log = logger.new(path, level)
+  log = logging.new(path, level)
 end
 
 function graphics.closeLog()
@@ -74,7 +74,7 @@ function graphics.draw.rect(x, y, xx, yy, color)
     color = gpu.getBackground()
   end
   log:printFormatted(
-    logger.verbosity.debug,
+    logging.verbosity.debug,
     "Drawing rectangle from (%i, %i) to (%i, %i) in color 0x%x",
     x,
     y,
@@ -227,7 +227,7 @@ function graphics.button.draw(button)
   end
 
   log:printFormatted(
-    logger.verbosity.debug,
+    logging.verbosity.debug,
     "Drawing button %s from (%i, %i) to (%i, %i) with background 0x%x",
     button.label,
     button.x,
@@ -254,7 +254,7 @@ function graphics.button.draw(button)
   local oldForeground = gpu.setForeground(button.textColor)
   tty.setCursor(labelX, labelY)
   log:printFormatted(
-    logger.verbosity.debug,
+    logging.verbosity.debug,
     "Drawing label on button %s at (%i, %i) with foreground 0x%x and background 0x%x",
     button.label,
     labelX,
