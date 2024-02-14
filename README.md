@@ -42,7 +42,7 @@ Library that contains a lot of boiler plate behind logging.
     Writes a message at the given verbosity level to the log, unless `logger.verbosity.disabled` was passed to `logger.new`.
 
   - `Log:print(level: verbosity, msg: string)`  
-    Writes a message at the given verbosity level to the log, followed by a newline.
+    Writes a message at the given verbosity level to the log, followed by a newline. Basically a wrapper for `Log:write`.
 
   - `Log:writeFormatted(level: verbosity, format: string, ...: any)`  
     Writes a formatted message using [string.format](https://lua.org/manual/5.3/manual.html#pdf-string.format) at the given verbosity level to the log, unless `logger.verbosity.disabled` was passed to `logger.new`.
