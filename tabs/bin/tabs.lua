@@ -174,8 +174,8 @@ local function newTab()
 
   -- Button x values are set by `updateButtonWidths`
   log:flush()
-  local selectButton = graphics.button.new(SHELL, 1, screenHeight - TAB_HEIGHT, 1, screenHeight, 0x878787, backgroundColor)
-  local closeButton = graphics.button.new("X", 1, screenHeight - TAB_HEIGHT, 1, screenHeight, 0xff0000, 0xcc0000)
+  local selectButton = graphics.button.new(SHELL, 1, screenHeight - TAB_HEIGHT + 1, 1, screenHeight, 0x878787, backgroundColor)
+  local closeButton = graphics.button.new("X", 1, screenHeight - TAB_HEIGHT + 1, 1, screenHeight, 0xff0000, 0xcc0000)
 
   local tab = {
     buffer=gpu.allocateBuffer(screenWidth, screenHeight - TAB_HEIGHT),
@@ -213,7 +213,7 @@ term.window.height = screenHeight - TAB_HEIGHT
 newTabButton = graphics.button.new(
   "+",
   screenWidth - 4,
-  screenHeight - TAB_HEIGHT,
+  screenHeight - TAB_HEIGHT + 1,
   screenWidth,
   screenHeight,
   0xb4b4b4,
@@ -393,7 +393,7 @@ closeTabListenerId = event.listen(
   closeTabListener
 )
 
--- Stop the main shell from executing until it gets a special interrupt event
+-- Stop the main shell from executing until tabs closes
 local ev = ""
 repeat
   ev = event.pull("interrupted")
