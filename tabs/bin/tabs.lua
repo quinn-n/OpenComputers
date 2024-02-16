@@ -55,7 +55,7 @@ graphics.startLog(logDir .. "/graphics.log", LOG_LVL)
 --- @field cursorRow number | nil
 --- @field selectButton Button
 --- @field closeButton Button
--- This is a thread object, but the thread library doesn't have a type for it
+--- This is a thread object, but the thread library doesn't have a type for it
 --- @field thread table
 
 --- @param tabId number
