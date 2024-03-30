@@ -30,9 +30,6 @@ local backgroundColor = gpu.getBackground()
 local screenWidth, screenHeight = gpu.getResolution()
 local SHELL = os.getenv("SHELL")
 
--- NOTE: This is a small possible attack vector from anyone who can overwrite the $HOME environment variable
--- However I'm not going to worry too much about it because the same kind of attack can be done with the $SHELL
--- environment variable above which there's no way around.
 local logDir = os.getenv("HOME") .. "/.local/tabs/log/"
 if LOG_LVL ~= logging.verbosity.disabled then
   -- This will print an error if the directory already exists
@@ -70,6 +67,7 @@ local function getTabWidth()
   return math.floor((screenWidth - 5) / #tabs)
 end
 
+--- Update the xmin and xmax values of the buttons
 local function updateButtonWidths()
   local tabWidth = getTabWidth()
   log:printFormatted(
@@ -168,6 +166,7 @@ local function switchTab(tab)
   tab.thread:resume()
 end
 
+--- Creates a new tab and switches to it
 --- @return Tab
 local function newTab()
   log:print(logging.verbosity.info, "Creating new tab")
@@ -220,7 +219,7 @@ newTabButton = graphics.button.new(
   0x787878
 )
 
--- Cleanup and exit
+--- Cleanup and exit
 local function quit()
   -- Kill any remaining tabs
   for _, tab in pairs(tabs) do
@@ -283,6 +282,7 @@ local function quit()
   event.push("interrupted_tabs")
 end
 
+--- Closes a tab and cleans up its resources
 --- @param tab Tab
 --- @param _quitting? boolean used by the quit function to avoid re-calling `quit()`
 function closeTab(tab, _quitting)
